@@ -10,14 +10,14 @@ using namespace std;
 
 PGM *img = new PGM();
 
-float degree2rad(float ang);
 void plotPixel(int x1, int y1, int x2, int y2, int dx, int dy, int decide);
 
 int main (void) {
 	setlocale(LC_ALL, "Portuguese");
-  int x1, y1, x2, y2, dx, dy, pk;
+  int x1, x2, y1, y2, dx,dy,p,p2,xy2,x,y,xf; 
   img->createImage(500, 500);
 
+  // Defne os pontos (x1, y1) e (x2, y2)
   do {
     cout << "Informe x1: ";
     cin >> x1;
@@ -31,49 +31,42 @@ int main (void) {
     cin >> y2;
   } while (x2 < 0 || x2 > img->getWidth() || y2 < 0 || y2 > img->getWidth());
  
-  dx = abs(x2 - x1);
-  dy = abs(y2 - y1);
+ // Define a distancia entre x1, x2 e y1, y2 
+  dx = x2 - x1;
+  dy = y2 - y1;
 
-  if (dx > dy) {
-    plotPixel(x1, y1, x2, y2, dx, dy, 0);
+  // varável de decisão P: 
+  p = 2 * dy - dx;
+  p2 = 2 * dy;
+  xy2 = 2 * (dy-dx);
+  if (x1>x2) {
+    x = x2; 
+    y = y2; 
+    xf = x1; 
   }
   else {
-    plotPixel(y1, x1, y2, x2, dy, dx, 1);
+    x = x1; 
+    y = y1; 
+    xf = x2; 
+  }
+  img->setPixel(x, y, 255);
+
+  while (x<xf) {
+    x++;
+    if (p<0) {
+      // próximo ponto será (x+1, y)
+      p += p2;
+    }
+    else {
+      // próximo ponto será (x+1, y+1)
+      // P é recalculado
+      y++;
+      p += xy2;
+    }
+    img->setPixel(x, y, 255);
   }
 
   img->gravar("saida.pgm");
 	system("Pause");
 	return EXIT_SUCCESS; 
-}
-
-float degree2rad(float ang) {
-	float r = ang * (float)(_PI / 180.0);
-	return r;
-}
-
-void plotPixel(int x1, int y1, int x2, int y2, int dx, int dy, int decide) {
-  int pk = 2 * dy - dx;
-  for (int i = 0; i <= dx; i++) {
-    x1 < x2 ? x1++ : x1--;
-    if (pk < 0) {
-      if (decide == 0) {
-        pk = pk + 2 * dy;
-      }
-      else {
-        pk = pk + 2 * dy;
-      }
-    }
-    else {
-      y1 < y2 ? y1++ : y1--;
-      if (decide == 0) {
-        img->setPixel(x1, y1, 255);
-        // putpixel(x1, y1, RED);
-      }
-      else {
-        img->setPixel(y1, x1, 255);
-        //  putpixel(y1, x1, YELLOW);
-      }
-      pk = pk + 2 * dy - 2 * dx;
-    }
-  }
 }
